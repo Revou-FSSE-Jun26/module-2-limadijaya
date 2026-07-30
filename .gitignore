@@ -1,0 +1,13 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Database backups / dumps
+*.dump
+*.pgdump
+*.sql.bak
+
+# IDE & Environment settings
+.vscode/
+.idea/
+.env
