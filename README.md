@@ -1,28 +1,67 @@
-<!-- [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/wGq_UtnU) -->
+# RevoShop Backend — Checkpoint 2: Flask & SQLAlchemy Layer
 
-# RevoShop Database Design (Checkpoint 1)
-
-This repository contains the core PostgreSQL database schema design, initial seed data, and verification queries for RevoShop.
-
-## 📊 Entity Relationship Diagram (ERD)
-
-The database structure consists of 5 tables: `users`, `categories`, `products`, `orders`, and `order_items`.
-
-![Schema Diagram](./schema_diagram.png)
+Welcome to Checkpoint 2 of the **RevoShop** backend application! This stage builds directly upon the database foundation established in Checkpoint 1 by introducing a Flask application layer, SQLAlchemy ORM models, Flask-Migrate schema updates, and live API endpoints.
 
 ---
 
-## 🚀 Local Setup Instructions
+## 🚀 What's New in Checkpoint 2
 
-### Prerequisites
+- **Application Factory Pattern:** Modular application structure utilizing Flask Blueprints.
+- **SQLAlchemy ORM Mapping:** Direct object-relational mapping for `User`, `Category`, `Product`, `Order`, and the `order_items` junction table.
+- **Database Migrations:** Schema evolution managed via `Flask-Migrate` (Alembic), introducing the `role` column on the `users` table without data loss.
+- **API Endpoints:**
+  - Hardcoded product lookup routes (`GET /products`, `GET /products/<id>`).
+  - Database-backed user registration (`POST /users/register`).
+  - Database-backed user retrieval (`GET /users/<id>`).
+- **Postman API Documentation:** Fully documented request/response examples for all endpoints.
 
-- [PostgreSQL](https://www.postgresql.org/) (v14 or higher recommended)
-- [pgAdmin 4](https://www.pgadmin.org/) or PostgreSQL CLI (`psql`)
+---
 
-### Step 1: Create Database
+## 📚 API Documentation
 
-1. Open pgAdmin or login via `psql`.
-2. Execute:
-   ```sql
-   CREATE DATABASE revoshop_db;
-   ```
+Interactive Postman API documentation containing full request bodies, headers, status codes, and example payloads:
+
+👉 **[View RevoShop Postman API Documentation](https://documenter.getpostman.com/view/27743466/2sBYApysck#86279202-d1d5-4feb-b6a4-b9df51af69f4)**
+
+---
+
+## 🖼️ Database & Verification Screenshots
+
+### 1. User Table Schema Migration
+
+Confirms the successful execution of `flask db upgrade`, adding the `role` column to the `users` table with default value `'customer'`.
+
+![User Table with Role Column](./user_table_with_role_column.png)
+
+---
+
+### 2. Junction Table (`order_items`) Association
+
+Confirms the creation and mapping of the `order_items` association table, linking orders to multiple products in a many-to-many relationship.
+
+![Order Items Association Table](./order_items_association.png)
+
+---
+
+## 🛠️ Project Structure
+
+```text
+revoshop-backend/
+├── app/
+│   ├── __init__.py           # Application factory & extension initialization
+│   ├── models.py             # SQLAlchemy models & order_items association table
+│   └── routes/
+│       ├── __init__.py
+│       ├── products.py       # Product endpoints
+│       └── users.py          # User registration & lookup endpoints
+├── migrations/               # Flask-Migrate (Alembic) version history
+├── sql/
+│   ├── schema.sql            # Checkpoint 1 SQL schema
+│   ├── seed.sql              # Updated sample data
+│   └── queries.sql           # Verification SQL queries
+├── .gitignore
+├── config.py                 # Database URI & configuration settings
+├── README.md                 # Project documentation
+├── requirements.txt          # Dependencies
+└── run.py                    # Application entrypoint
+```
