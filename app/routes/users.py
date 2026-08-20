@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash
 from app import db
 from app.models import User
 
 users_bp = Blueprint('users', __name__)
 
-@users_bp.route('/register', methods=['POST'])
+
+@users_bp.route('', methods=['POST'])
 def register_user():
-    """POST /users/register - Create a new user."""
+    """POST /users - Register a new user."""
     data = request.get_json() or {}
 
     # Validate mandatory inputs
@@ -17,17 +19,24 @@ def register_user():
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'error': 'User with this email already exists'}), 409
 
-    new_user = User(
-        username=data['username'],
-        email=data['email'],
-        password_hash=data['password'],
-        role=data.get('role', 'customer')
-    )
+    # Hash the password using werkzeug
+    password_hash = generate_password_hash(data['password'])
 
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=password_hash,
+            role=data.get('role', 'customer')
+        )
 
-    return jsonify(new_user.to_dict()), 201
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify(new_user.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 @users_bp.route('/<int:user_id>', methods=['GET'])
