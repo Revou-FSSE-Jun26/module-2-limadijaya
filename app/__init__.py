@@ -6,6 +6,7 @@ from config import Config
 db = SQLAlchemy()
 migrate = Migrate()
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -14,11 +15,8 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Import and register blueprints
-    from app.routes.products import products_bp
-    from app.routes.users import users_bp
-
-    app.register_blueprint(products_bp, url_prefix='/products')
-    app.register_blueprint(users_bp, url_prefix='/users')
+    # Register all routes from separate file
+    from app.routes import register_routes
+    register_routes(app)
 
     return app
