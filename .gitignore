@@ -10,4 +10,22 @@ Thumbs.db
 # IDE & Environment settings
 .vscode/
 .idea/
+
+# Environment variables
 .env
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/

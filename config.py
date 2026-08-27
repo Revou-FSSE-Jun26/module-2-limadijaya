@@ -1,12 +1,22 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-12345')
-    
-    # Connection String Format: postgresql://username:password@localhost:5432/database_name
-    # Replace 'postgres:postgres' with your local PostgreSQL user and password.
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL', 
-        'postgresql://postgres:Lolihai88$@localhost/revoshop_db' 
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-12345')
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        'DATABASE_URL',
+        'postgresql://postgres:postgres@localhost:5432/revoshop_db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
+
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        'TEST_DATABASE_URL',
+        'sqlite:///test.db'
+    )
