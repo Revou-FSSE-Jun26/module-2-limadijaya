@@ -19,8 +19,8 @@ A RESTful e-commerce backend API built with Flask and PostgreSQL. RevoShop provi
 - **Flask** — Lightweight Python web framework
 - **SQLAlchemy** — ORM for database operations
 - **Flask-Migrate** — Database migration management (Alembic)
-- **PostgreSQL** — Production relational database
-- **pgAdmin** — Database administration tool
+- **PostgreSQL** — Production relational database, hosted on **Supabase**
+- **pgAdmin / DBeaver** — Database administration tools
 - **pytest** — Unit and integration testing
 - **Locust** — Load/performance testing
 - **python-dotenv** — Environment variable management
@@ -94,15 +94,19 @@ cp .env.example .env
 ```
 
 ### 5. Set up the database
-Make sure PostgreSQL is running and create the database:
+Either run a local PostgreSQL instance and create the database:
 ```sql
 CREATE DATABASE revoshop_db;
 ```
+or point `DATABASE_URL` in `.env` at a hosted database (e.g. Supabase — see
+[Deployed Database](#deployed-database) below for the connection string format).
 
 ### 6. Run migrations
 ```bash
 flask db upgrade
 ```
+This creates all tables (`users`, `products`, `categories`, `orders`, `order_items`)
+in whichever database `DATABASE_URL` points to.
 
 ### 7. Start the development server
 ```bash
@@ -136,6 +140,39 @@ increase to 200.
 
 Full Postman documentation with example requests and responses for every endpoint:
 [RevoShop API — Postman Documentation](https://documenter.getpostman.com/view/27743466/2sBYApysck)
+
+A ready-to-import Postman collection covering every endpoint (happy path and error
+cases) is also included in the repo: [`RevoShop.postman_collection.json`](RevoShop.postman_collection.json).
+
+## Deployed Database
+
+The production PostgreSQL database is hosted on [Supabase](https://supabase.com).
+All tables (`users`, `products`, `categories`, `orders`, `order_items`) — along with
+their foreign keys, cascade/restrict rules, and unique constraints — are created
+entirely through Flask-Migrate/Alembic:
+
+```bash
+flask db upgrade
+```
+
+This applies `migrations/versions/c4e236e09619_create_all_tables.py`, which is
+auto-generated directly from `app/models.py`, so the live schema always matches the
+application code.
+
+### Connecting to Supabase
+
+Supabase's direct connection host (`db.<project-ref>.supabase.co`) resolves to an
+IPv6-only address, which some networks can't reach. Use the **Session pooler** or
+**Transaction pooler** connection string instead (IPv4-compatible), available from
+the **Connect** button on the Supabase project dashboard:
+
+```
+DATABASE_URL=postgresql://postgres.<project-ref>:<password>@<pooler-host>.pooler.supabase.com:6543/postgres
+```
+
+This is the value used for `DATABASE_URL` in `.env`. The database name stays
+`postgres` — Supabase projects only expose a single database, with application
+tables living in the default `public` schema.
 
 ## Project Structure
 

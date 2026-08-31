@@ -1,0 +1,569 @@
+{
+  "info": {
+    "name": "RevoShop API",
+    "description": "Full CRUD collection for the RevoShop API — users, auth, products, categories, and orders. Covers happy path and error cases for each endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register User - Success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\",\n  \"role\": \"customer\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] },
+            "description": "Happy path: creates a new user. Expect 201 with the user object (no password_hash in response)."
+          }
+        },
+        {
+          "name": "Register User - Missing Fields (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"incomplete@example.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] },
+            "description": "Error case: missing username and password. Expect 400."
+          }
+        },
+        {
+          "name": "Register User - Duplicate Email (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice_smith\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] },
+            "description": "Error case: email already exists in seed data. Expect 409."
+          }
+        },
+        {
+          "name": "Get User by ID - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/users/1", "host": ["{{base_url}}"], "path": ["users", "1"] },
+            "description": "Happy path: fetch user 1 (alice_smith from seed data). Expect 200."
+          }
+        },
+        {
+          "name": "Get User by ID - Not Found (Error)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/users/9999", "host": ["{{base_url}}"], "path": ["users", "9999"] },
+            "description": "Error case: user does not exist. Expect 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Happy path: login with correct credentials. Use a user registered via the Users folder first. Expect 200."
+          }
+        },
+        {
+          "name": "Login - Wrong Password (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Error case: incorrect password. Expect 401."
+          }
+        },
+        {
+          "name": "Login - Missing Fields (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Error case: missing password field. Expect 400."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] },
+            "description": "Happy path: list all products. Expect 200 with array."
+          }
+        },
+        {
+          "name": "Get Product by ID - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/products/1", "host": ["{{base_url}}"], "path": ["products", "1"] },
+            "description": "Happy path: fetch product 1. Expect 200."
+          }
+        },
+        {
+          "name": "Get Product by ID - Not Found (Error)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/products/9999", "host": ["{{base_url}}"], "path": ["products", "9999"] },
+            "description": "Error case: product does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Create Product - Success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ergonomic Wireless Mouse\",\n  \"description\": \"Rechargeable mouse with silent clicks\",\n  \"price\": 45.99,\n  \"stock_quantity\": 120,\n  \"category_id\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] },
+            "description": "Happy path: creates a new product under Electronics (category 1). Expect 201."
+          }
+        },
+        {
+          "name": "Create Product - Missing Name (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 45.99,\n  \"category_id\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] },
+            "description": "Error case: name field missing. Expect 400."
+          }
+        },
+        {
+          "name": "Create Product - Invalid Price (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bad Price Product\",\n  \"price\": -10,\n  \"category_id\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] },
+            "description": "Error case: negative price. Expect 400."
+          }
+        },
+        {
+          "name": "Create Product - Category Not Found (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Orphan Product\",\n  \"price\": 20,\n  \"category_id\": 9999\n}"
+            },
+            "url": { "raw": "{{base_url}}/products", "host": ["{{base_url}}"], "path": ["products"] },
+            "description": "Error case: category_id does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Update Product - Success",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 179.99,\n  \"stock_quantity\": 40\n}"
+            },
+            "url": { "raw": "{{base_url}}/products/1", "host": ["{{base_url}}"], "path": ["products", "1"] },
+            "description": "Happy path: partial update of product 1's price and stock. Expect 200."
+          }
+        },
+        {
+          "name": "Update Product - Not Found (Error)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 50\n}"
+            },
+            "url": { "raw": "{{base_url}}/products/9999", "host": ["{{base_url}}"], "path": ["products", "9999"] },
+            "description": "Error case: product does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Update Product - Invalid Price (Error)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": -5\n}"
+            },
+            "url": { "raw": "{{base_url}}/products/1", "host": ["{{base_url}}"], "path": ["products", "1"] },
+            "description": "Error case: negative price on update. Expect 400."
+          }
+        },
+        {
+          "name": "Delete Product - Blocked by Active Orders (Error)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/products/1", "host": ["{{base_url}}"], "path": ["products", "1"] },
+            "description": "Error case: product 1 is referenced by existing order_items. Expect 400 with deletion guard message."
+          }
+        },
+        {
+          "name": "Delete Product - Not Found (Error)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/products/9999", "host": ["{{base_url}}"], "path": ["products", "9999"] },
+            "description": "Error case: product does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Delete Product - Success",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/products/2", "host": ["{{base_url}}"], "path": ["products", "2"] },
+            "description": "Happy path: deletes product 2 (Keyboard), which has no order_items referencing it. Expect 200."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] },
+            "description": "Happy path: list all categories. Expect 200 with array."
+          }
+        },
+        {
+          "name": "Get Category by ID - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/categories/1", "host": ["{{base_url}}"], "path": ["categories", "1"] },
+            "description": "Happy path: fetch category 1 with its nested products array. Expect 200."
+          }
+        },
+        {
+          "name": "Get Category by ID - Not Found (Error)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/categories/9999", "host": ["{{base_url}}"], "path": ["categories", "9999"] },
+            "description": "Error case: category does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Create Category - Success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Books\",\n  \"description\": \"Physical and digital books\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] },
+            "description": "Happy path: creates a new category. Expect 201."
+          }
+        },
+        {
+          "name": "Create Category - Missing Name (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"No name provided\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] },
+            "description": "Error case: name field missing. Expect 400."
+          }
+        },
+        {
+          "name": "Create Category - Duplicate Name (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] },
+            "description": "Error case: category name already exists in seed data. Expect 409."
+          }
+        },
+        {
+          "name": "Update Category - Success",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Home, Kitchen & Dining\",\n  \"description\": \"Furniture, cookware, appliances, and dining essentials\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories/3", "host": ["{{base_url}}"], "path": ["categories", "3"] },
+            "description": "Happy path: updates category 3's name and description. Expect 200."
+          }
+        },
+        {
+          "name": "Update Category - Not Found (Error)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ghost Category\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories/9999", "host": ["{{base_url}}"], "path": ["categories", "9999"] },
+            "description": "Error case: category does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Update Category - Empty Name (Error)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories/1", "host": ["{{base_url}}"], "path": ["categories", "1"] },
+            "description": "Error case: name set to empty string. Expect 400."
+          }
+        },
+        {
+          "name": "Delete Category - Success",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/categories/4", "host": ["{{base_url}}"], "path": ["categories", "4"] },
+            "description": "Happy path: deletes a category with no products (e.g. one created via 'Create Category - Success'). Expect 200."
+          }
+        },
+        {
+          "name": "Delete Category - Not Found (Error)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/categories/9999", "host": ["{{base_url}}"], "path": ["categories", "9999"] },
+            "description": "Error case: category does not exist. Expect 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Get All Orders - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] },
+            "description": "Happy path: list all orders. Expect 200 with array."
+          }
+        },
+        {
+          "name": "Get Orders by User ID - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders?user_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["orders"],
+              "query": [{ "key": "user_id", "value": "1" }]
+            },
+            "description": "Happy path: list orders filtered to user 1. Expect 200 with array."
+          }
+        },
+        {
+          "name": "Get Orders by User ID - User Not Found (Error)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders?user_id=9999",
+              "host": ["{{base_url}}"],
+              "path": ["orders"],
+              "query": [{ "key": "user_id", "value": "9999" }]
+            },
+            "description": "Error case: user_id filter does not match any user. Expect 404."
+          }
+        },
+        {
+          "name": "Get Order by ID - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/orders/1", "host": ["{{base_url}}"], "path": ["orders", "1"] },
+            "description": "Happy path: fetch order 1 with its items and product details. Expect 200."
+          }
+        },
+        {
+          "name": "Get Order by ID - Not Found (Error)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/orders/9999", "host": ["{{base_url}}"], "path": ["orders", "9999"] },
+            "description": "Error case: order does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Create Order - Success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"items\": [\n    { \"product_id\": 1, \"quantity\": 2 },\n    { \"product_id\": 3, \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] },
+            "description": "Happy path: places a new order for user 1 with two line items. total_amount is calculated server-side. Expect 201."
+          }
+        },
+        {
+          "name": "Create Order - Missing user_id (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"product_id\": 1, \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] },
+            "description": "Error case: user_id missing from body. Expect 400."
+          }
+        },
+        {
+          "name": "Create Order - No Items (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"items\": []\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] },
+            "description": "Error case: empty items array. Expect 400."
+          }
+        },
+        {
+          "name": "Create Order - Invalid Product (Error)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"items\": [\n    { \"product_id\": 9999, \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] },
+            "description": "Error case: product_id does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Update Order Status - Success",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"shipped\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders/3", "host": ["{{base_url}}"], "path": ["orders", "3"] },
+            "description": "Happy path: updates order 3's status to 'shipped'. Expect 200."
+          }
+        },
+        {
+          "name": "Update Order Status - Not Found (Error)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"shipped\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders/9999", "host": ["{{base_url}}"], "path": ["orders", "9999"] },
+            "description": "Error case: order does not exist. Expect 404."
+          }
+        },
+        {
+          "name": "Update Order Status - Invalid Status (Error)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"processing\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders/1", "host": ["{{base_url}}"], "path": ["orders", "1"] },
+            "description": "Error case: status value not in allowed list. Expect 400."
+          }
+        },
+        {
+          "name": "Delete Order - Success",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/orders/3", "host": ["{{base_url}}"], "path": ["orders", "3"] },
+            "description": "Happy path: deletes order 3 and its order_items. Expect 200."
+          }
+        },
+        {
+          "name": "Delete Order - Not Found (Error)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/orders/9999", "host": ["{{base_url}}"], "path": ["orders", "9999"] },
+            "description": "Error case: order does not exist. Expect 404."
+          }
+        }
+      ]
+    }
+  ]
+}
