@@ -1,9 +1,10 @@
--- 1. USERS TABLE (Note: No role column yet)
+-- 1. USERS TABLE
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
+    username VARCHAR(80) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'customer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -20,8 +21,8 @@ CREATE TABLE products (
     category_id INT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
     name VARCHAR(150) NOT NULL,
     description TEXT,
-    price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
-    stock_quantity INT NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0),
+    price NUMERIC(10, 2) NOT NULL,
+    stock_quantity INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -39,6 +40,6 @@ CREATE TABLE order_items (
     id SERIAL PRIMARY KEY,
     order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id INT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
-    quantity INT NOT NULL CHECK (quantity > 0),
-    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0)
+    quantity INT NOT NULL DEFAULT 1,
+    unit_price NUMERIC(10, 2) NOT NULL
 );
