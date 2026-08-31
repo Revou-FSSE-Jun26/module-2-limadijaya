@@ -79,17 +79,21 @@ def create_order():
 
 @orders_bp.route('', methods=['GET'])
 def get_orders():
-    """GET /orders - List all orders for the current user (user_id via query param)."""
+    """GET /orders - List all orders.
+
+    Returns the full list of orders by default. If a user_id query
+    parameter is provided, the list is filtered to that user's orders.
+    """
     user_id = request.args.get('user_id', type=int)
 
-    if not user_id:
-        return jsonify({'error': 'user_id query parameter is required'}), 400
+    if user_id:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        orders = Order.query.filter_by(user_id=user_id).all()
+    else:
+        orders = Order.query.all()
 
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-
-    orders = Order.query.filter_by(user_id=user_id).all()
     return jsonify([order.to_dict() for order in orders]), 200
 
 
