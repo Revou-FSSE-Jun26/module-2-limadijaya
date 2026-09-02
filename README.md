@@ -2,6 +2,8 @@
 
 A RESTful e-commerce backend API built with Flask and PostgreSQL. RevoShop provides full CRUD operations for products, categories, orders, and users, with a many-to-many relationship between orders and products through an order_items junction table.
 
+**Live API:** [https://module-2-limadijaya.onrender.com](https://module-2-limadijaya.onrender.com)
+
 ## Features
 
 - **User Management** — Register new users with secure password hashing (Werkzeug), retrieve user profiles.
@@ -143,6 +145,21 @@ Full Postman documentation with example requests and responses for every endpoin
 
 A ready-to-import Postman collection covering every endpoint (happy path and error
 cases) is also included in the repo: [`RevoShop.postman_collection.json`](RevoShop.postman_collection.json).
+
+## Deployment
+
+The Flask API is deployed on [Render](https://render.com) as a web service and is
+publicly accessible at:
+
+**[https://module-2-limadijaya.onrender.com](https://module-2-limadijaya.onrender.com)**
+
+Render runs the app with gunicorn (`gunicorn run:app`) and installs dependencies from
+`requirements.txt`. Configuration is defined in `render.yaml`. Environment variables
+(`DATABASE_URL`, `SECRET_KEY`, `DEBUG`) are set in the Render dashboard, so no secrets
+live in the repo.
+
+> Note: on Render's free tier the service sleeps after inactivity, so the first request
+> after an idle period may take 30-60 seconds to respond while it wakes up.
 
 ## Deployed Database
 

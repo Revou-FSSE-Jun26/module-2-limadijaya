@@ -19,4 +19,14 @@ def create_app(config_class=Config):
     from app.routes import register_routes
     register_routes(app)
 
+    # Root health-check / welcome route
+    @app.route('/')
+    def index():
+        from flask import jsonify
+        return jsonify({
+            'service': 'RevoShop API',
+            'status': 'running',
+            'endpoints': ['/users', '/auth/login', '/products', '/categories', '/orders']
+        }), 200
+
     return app
